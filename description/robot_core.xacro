@@ -19,20 +19,24 @@
         <color rgba="0 0 0 1" />
     </material>
 
+    <material name="red">
+        <color rgba="1 0 0 1"/>
+    </material>
+
 
     <!-- Base link -->
     <link name="base_link">
 
     </link>
 
-    <!-- Chasis link -->
-    <joint name="chasis_joint" type="fixed">
+    <!-- chassis link -->
+    <joint name="chassis_joint" type="fixed">
         <parent link="base_link" />
-        <child link="chasis" />
+        <child link="chassis" />
         <origin xyz="-0.1 0 0" />
     </joint>
 
-    <link name="chasis">
+    <link name="chassis">
         <visual>
             <origin xyz="0.15 0 0.075" />
             <geometry>
@@ -110,13 +114,13 @@
         </xacro:inertial_cylinder>
     </link>
 
-    <gazebo reference="right_wheel">
+    <gazebo reference="rigth_wheel">
         <material>Gazebo/Blue</material>
     </gazebo>
 
      <!-- Caster Wheel link -->
     <joint name="caster_wheel_joint" type="fixed">
-        <parent link="chasis" />
+        <parent link="chassis" />
         <child link="caster_wheel" />
         <origin xyz="0.24 0 0" />
     </joint>
