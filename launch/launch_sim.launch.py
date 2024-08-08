@@ -4,8 +4,9 @@ from ament_index_python.packages import get_package_share_directory
 
 
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, ExecuteProcess, RegisterEventHandler
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.event_handlers import OnProcessExit
 
 from launch_ros.actions import Node
 
@@ -55,17 +56,18 @@ def generate_launch_description():
                         output='screen')
 
 
-    # diff_drive_spawner = Node(
-    #     package="controller_manager",
-    #     executable="spawner.py",
-    #     arguments=["diff_cont"],
-    # )
+    diff_drive_spawner = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+             'diff_cont'],
+        output='screen'
+    )
 
-    # joint_broad_spawner = Node(
-    #     package="controller_manager",
-    #     executable="spawner.py",
-    #     arguments=["joint_broad"],
-    # )
+
+    joint_broad_spawner = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+             'joint_broad'],
+        output='screen'
+    )
 
 
     # Code for delaying a node (I haven't tested how effective it is)
@@ -88,6 +90,18 @@ def generate_launch_description():
 
     # Launch them all!
     return LaunchDescription([
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=spawn_entity,
+                on_exit=[joint_broad_spawner],
+            )
+        ),
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=joint_broad_spawner,
+                on_exit=[diff_drive_spawner],
+            )
+        ),
         rsp,
         # joystick,
         # twist_mux,
