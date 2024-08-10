@@ -22,6 +22,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource([get_package_share_directory('nav2_bringup'),'/launch','/bringup_launch.py']),
         launch_arguments={
         'map':map_file,
+        # "remappings" : [('/cmd_vel', '/diff_cont/cmd_vel_unstamped')],
         'params_file': params_file}.items(),
 
     ),
