@@ -21,15 +21,16 @@ class ImageSub(Node):
             callback=self.image_callback,
             qos_profile=10
         )
-        self.depth_sub = self.create_subscription(
-            msg_type=Image,
-            topic="/camera/depth/image_raw",
-            callback=self.depth_callback,
-            qos_profile=10
-        )
+        # self.depth_sub = self.create_subscription(
+        #     msg_type=Image,
+        #     topic="/camera/depth/image_raw",
+        #     callback=self.depth_callback,
+        #     qos_profile=10
+        # )
         self.sub
-        self.depth_sub
+        # self.depth_sub
         self.bridge = CvBridge()
+        self.min_dist = "None"
 
         # load weigths, cfg file and class names
         package_dir = get_package_share_directory("intel_sys")
@@ -81,14 +82,25 @@ class ImageSub(Node):
             if i in indexes:
                 x, y, w, h = boxes[i]
                 label = str(self.class_names[class_ids[i]])
+                self.x, self.y, self.w, self.h = x, y, w, h
+                self.depth_sub = self.create_subscription(
+                    msg_type=Image,
+                    topic="/camera/depth/image_raw",
+                    callback=self.depth_callback,
+                    qos_profile=1
+                )
                 cv.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                cv.putText(frame, label, (x, y - 10), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                cv.putText(frame, label + self.min_dist, (x, y - 10), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
         
         cv.imshow('Image', frame)
         cv.waitKey(1)
     
     def depth_callback(self, msg):
-        pass
+        self.depth_image = self.bridge.imgmsg_to_cv2(msg, '16UC1')
+        img = self.depth_image[self.x:self.x + self.w, self.y:self.y + self.h]
+        # cv.imshow("depth",img)
+        # cv.waitKey(1)
+        self.min_dist = str(np.nanmin(self.depth_image))
 
 
 

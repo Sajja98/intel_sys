@@ -45,6 +45,7 @@ ament_python_install_package(${PROJECT_NAME})
 # Install Python executables
 install(PROGRAMS
   scripts/detection_node.py
+  scripts/point_cloud.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
